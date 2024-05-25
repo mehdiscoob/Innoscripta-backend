@@ -1,7 +1,9 @@
 <?php
 
-use Illuminate\Http\Request;
+use App\Http\Controllers\UserPreference\UserPreferenceController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Article\ArticleController;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,26 +16,19 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:api')->prefix('user')->group(function () {
-    Route::get("profile/{id}",[\App\Http\Controllers\UserController::class,"findById"]);
-});
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
+Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
 
-Route::prefix('user')->group(function () {
-Route::get("{id}",[\App\Http\Controllers\UserController::class,"findById"]);
-Route::get("/",[\App\Http\Controllers\UserController::class,"getUserPaginate"])->middleware('auth:api');
-});
+Route::group(['middleware' => 'auth:sanctum'], function () {
 
-Route::post('/login', [\App\Http\Controllers\Auth\LoginController::class,"login"])->name('login');
+    Route::middleware(['auth:api'])->prefix('article')->group(function () {
+        Route::get('/', [ArticleController::class, "index"])->name('article');
+        Route::get('/{id}', [ArticleController::class, "show"])->name('article.id');
+    });
 
-Route::post('/register', [\App\Http\Controllers\UserController::class,"register"])->name('register');
-
-Route::middleware(['auth:api'])->prefix('article')->group(function () {
-    Route::get('/', [\App\Http\Controllers\Article\ArticleController::class,"getArticlePaginate"])->name('article');
-    Route::get('/by-user', [\App\Http\Controllers\Article\ArticleController::class,"getArticelsByUserID"])->name('article.by.user');
-    Route::get('/{id}', [\App\Http\Controllers\Article\ArticleController::class,"findById"])->name('article.id');
-    Route::post('/', [\App\Http\Controllers\Article\ArticleController::class,"store"])->name('article.create');
-    Route::patch('/{id}', [\App\Http\Controllers\Article\ArticleController::class,"update"])->name('article.update.id');
-    Route::delete('/{id}', [\App\Http\Controllers\Article\ArticleController::class,"delete"])->name('article.delete.id');
-    Route::patch('/status/{id}', [\App\Http\Controllers\Article\ArticleController::class,"update"])->name('article.change.status.id');
-
+    Route::middleware(['auth:api'])->prefix('user-preference')->group(function () {
+        Route::get('/user/preferences', [UserPreferenceController::class, 'getUserPreferences']);
+        Route::post('/user/preferences', [UserPreferenceController::class, 'updateUserPreferences']);
+    });
 });

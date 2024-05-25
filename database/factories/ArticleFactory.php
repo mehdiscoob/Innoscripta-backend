@@ -2,9 +2,9 @@
 
 namespace Database\Factories;
 
+use App\Models\Article;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Models\User;
-use Modules\Article\App\Models\Article;
 
 class ArticleFactory extends Factory
 {
@@ -20,10 +20,14 @@ class ArticleFactory extends Factory
     {
         return [
             'title' => $this->faker->sentence,
-            'content' => $this->faker->paragraph,
-            'user_id' => User::find(1)->id,
-            'publication_date' => now()->toDateTimeString(),
-            'publication_status' => $this->faker->randomElement(['draft', 'publish']),
+            'description' => $this->faker->paragraph,
+            'content' => $this->faker->text,
+            'author' => $this->faker->name,
+            'source' => $this->faker->company,
+            'category' => $this->faker->word,
+            'url' => $this->faker->url,
+            'url_to_image' => $this->faker->imageUrl,
+            'published_at' => $this->faker->dateTime,
         ];
     }
 }

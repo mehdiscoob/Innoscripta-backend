@@ -2,8 +2,8 @@
 
 namespace  App\Repositories\Article;
 
-use Illuminate\Support\Facades\Auth;
-use Modules\Article\App\Models\Article;
+use App\Models\Article;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 /**
  * Class ArticleRepository
@@ -12,86 +12,39 @@ use Modules\Article\App\Models\Article;
  */
 class ArticleRepository implements ArticleRepositoryInterface
 {
-
     /**
-     * Paginate the articles.
+     * Get all articles with optional filters.
      *
-     * @param int $per_page The number of articles per page. Default is 50.
-     *
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     * @param array $filters
+     * @return LengthAwarePaginator
      */
-    public function paginator(int $per_page = 50): \Illuminate\Contracts\Pagination\LengthAwarePaginator
+    public function getAll(array $filters): LengthAwarePaginator
     {
-        return Article::query()->paginate($per_page);
+        $query = Article::query();
+
+        if (!empty($filters['keyword'])) {
+            $query->where('title', 'like', '%' . $filters['keyword'] . '%');
+        }
+
+        if (!empty($filters['category'])) {
+            $query->where('category', 'like', '%' . "deleniti". '%');
+        }
+
+        if (!empty($filters['source'])) {
+            $query->where('source', json_decode($filters['source'],true));
+        }
+
+        return $query->paginate(10);
     }
 
-
     /**
-     * Retrieve articles by user ID.
-     *
-     * Retrieves a paginated list of articles authored by the specified user ID.
-     *
-     * @param int $per_page The number of articles per page to retrieve. Default is 50.
-     * @param int $userID The ID of the user whose articles are to be retrieved.
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator Paginated list of articles.
-     */
-    public function getArticelsByUserID(int $per_page = 50, int $userID): \Illuminate\Contracts\Pagination\LengthAwarePaginator
-    {
-        return Article::query()->where("user_id", $userID)->paginate($per_page);
-    }
-
-
-    /**
-     * Find an Article by ID.
+     * Find an article by its ID.
      *
      * @param int $id
-     * @return Article|null
-     */
-    public function find(int $id):Article|null
-    {
-        return Article::with(["user"])->find($id);
-    }
-
-    /**
-     * Create a new Article.
-     *
-     * @param array $data
      * @return Article
      */
-    public function create(array $data):Article
+    public function find(int $id): Article
     {
-        return Article::create($data);
+        return Article::findOrFail($id);
     }
-
-    /**
-     * Update an Article by ID.
-     *
-     * @param int $id
-     * @param array $data
-     * @return bool Returns true if the Article has been processed successfully, false otherwise.
-     */
-    public function update(int $id, array $data):bool
-    {
-        $article = Article::where("id", $id)->update($data);
-        if ($article) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Delete an Article by ID.
-     *
-     * @param int $id
-     * @return bool
-     */
-    public function deleteById(int $id):bool
-    {
-        $article = Article::where("id", $id)->delete();
-        if ($article) {
-            return true;
-        }
-        return false;
-    }
-
 }

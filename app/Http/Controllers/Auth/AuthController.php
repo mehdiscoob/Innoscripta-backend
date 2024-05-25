@@ -3,46 +3,77 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Services\User\UserService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use App\Services\Auth\AuthService;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
-    /**
-     * The AuthService instance.
-     *
-     * @var AuthService
-     */
-    protected $authService;
 
-    /**
-     * Create a new controller instance.
-     *
-     * @param AuthService $authService The AuthService instance.
-     */
-    public function __construct(AuthService $authService)
+    private UserService $userService;
+
+    public function __construct(UserService $userService)
     {
-        $this->authService = $authService;
+        $this->userService = $userService;
     }
 
     /**
-     * Refresh the access token using the refresh token.
+     * Register a new user.
      *
-     * @param Request $request The HTTP request.
-     * @return JsonResponse The JSON response.
+     * @param Request $request
+     * @return JsonResponse
      */
-    public function refreshToken(Request $request): JsonResponse
+    public function register(Request $request): JsonResponse
     {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
 
-        $refreshToken = $request->input('refresh_token');
+        $user = $this->userService->register($request->all());
 
-        $accessToken = $this->authService->refreshToken($refreshToken);
+        return response()->json($user, 201);
+    }
 
-        if ($accessToken) {
-            return response()->json(['access_token' => $accessToken], 200);
+    /**
+     * Log in an existing user.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     * @throws ValidationException
+     */
+    public function login(Request $request): JsonResponse
+    {
+        $request->validate([
+            'email' => 'required|string|email',
+            'password' => 'required|string',
+        ]);
+
+        if (!Auth::attempt($request->only('email', 'password'))) {
+            throw ValidationException::withMessages([
+                'email' => ['The provided credentials are incorrect.'],
+            ]);
         }
 
-        return response()->json(['message' => 'Failed to refresh token'], 401);
+        $user = $request->user();
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        return response()->json(['access_token' => $token, 'token_type' => 'Bearer']);
+    }
+
+    /**
+     * Log out the authenticated user.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function logout(Request $request): JsonResponse
+    {
+        $request->user()->currentAccessToken()->delete();
+
+        return response()->json(['message' => 'Logged out successfully']);
     }
 }

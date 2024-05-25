@@ -13,8 +13,17 @@ class Article extends Model
     /**
      * The attributes that are mass assignable.
      */
-    protected $fillable = ['title', 'content', 'user_id', 'publication_date', 'publication_status'];
-
+    protected $fillable = [
+        'title',
+        'description',
+        'content',
+        'author',
+        'source',
+        'category',
+        'url',
+        'url_to_image',
+        'published_at',
+    ];
 
     /**
      * Get the Article associated with the user.

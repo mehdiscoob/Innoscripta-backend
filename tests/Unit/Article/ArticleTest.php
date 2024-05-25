@@ -3,8 +3,6 @@
 namespace Article;
 
 use App\Models\User;
-use Illuminate\Support\Facades\Auth;
-use Laravel\Passport\Token;
 use Modules\Article\App\Models\Article;
 use Tests\TestCase;
 

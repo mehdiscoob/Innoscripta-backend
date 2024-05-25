@@ -16,10 +16,14 @@ class CreateArticlesTable extends Migration
         Schema::create('articles', function (Blueprint $table) {
             $table->id();
             $table->string('title');
+            $table->text('description');
             $table->text('content');
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->timestamp('publication_date');
-            $table->enum('publication_status', ['draft', 'publish'])->default('draft');
+            $table->string('author')->nullable();
+            $table->string('source');
+            $table->string('category');
+            $table->string('url');
+            $table->string('url_to_image')->nullable();
+            $table->dateTime('published_at');
             $table->softDeletes();
             $table->timestamps();
         });
