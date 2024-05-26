@@ -15,8 +15,6 @@ class UserSeeder extends Seeder
     public function run()
     {
         $user=User::factory()->count(100)->create();
-//        foreach ($user as $u){
-//            $u->generate_token();
-//        }
+
     }
 }

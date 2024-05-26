@@ -8,6 +8,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpFoundation\Response;
 
 class AuthController extends Controller
 {
@@ -30,12 +31,12 @@ class AuthController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
+            'password' => 'required|string|min:8',
         ]);
 
         $user = $this->userService->register($request->all());
-
-        return response()->json($user, 201);
+        $token = $user->createToken('auth_token')->plainTextToken;
+        return response()->json(["user"=>$user,"access_token"=>$token], Response::HTTP_CREATED);
     }
 
     /**

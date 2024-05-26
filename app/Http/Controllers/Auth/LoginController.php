@@ -26,7 +26,7 @@ class LoginController extends Controller
         }else {
             return response()->json("Invalid credentials", 422);
         }
-        return $user->generate_token();
+        return $user;
     }
 
 }

@@ -90,7 +90,7 @@ class UserService implements UserServiceInterface
      */
     public function findById(int $id): ?User
     {
-        return $this->userRepository->findById($id)->generate_token();
+        return $this->userRepository->findById($id);
     }
 
     /**
@@ -134,7 +134,7 @@ class UserService implements UserServiceInterface
      */
     public function register(array $userData): User
     {
-        return $this->userRepository->create($userData)->generate_token();
+        return $this->userRepository->create($userData);
     }
 
     /**
