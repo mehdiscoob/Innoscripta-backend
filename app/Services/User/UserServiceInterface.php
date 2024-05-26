@@ -5,7 +5,7 @@ namespace App\Services\User;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\Paginator;
 
-interface UserServiceInterface
+interface UserServiceInterface extends \App\Services\Article\ArticleServiceInterface
 {
 
     /**

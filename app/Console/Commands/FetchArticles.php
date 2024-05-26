@@ -5,6 +5,7 @@
 namespace App\Console\Commands;
 
 use App\Services\Article\ArticleService;
+use App\Services\Fetch\FetchArticleService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
 
@@ -15,6 +16,7 @@ use Illuminate\Support\Facades\Http;
 class FetchArticles extends Command
 {
     private ArticleService $articleService;
+    private FetchArticleService $fetchArticleService;
 
     /**
      * The name and signature of the console command.
@@ -33,9 +35,10 @@ class FetchArticles extends Command
     /**
      * @param ArticleService $articleService
      */
-    public function __construct(ArticleService $articleService)
+    public function __construct(ArticleService $articleService, FetchArticleService $fetchArticleService)
     {
         $this->articleService = $articleService;
+        $this->fetchArticleService = $fetchArticleService;
         parent::__construct();
     }
 
@@ -47,10 +50,12 @@ class FetchArticles extends Command
      */
     public function handle(): string
     {
-        $this->fetchNewsAPIArticles();
-        $this->fetchGuardianArticles();
-        $this->fetchNYTimesArticles();
+//        $this->fetchNewsAPIArticles();
+//        $this->fetchGuardianArticles();
+//        $this->fetchNYTimesArticles();
+        $this->fetchArticleService;
         return "OK";
+
     }
 
     /**
@@ -65,7 +70,7 @@ class FetchArticles extends Command
         ]);
         $articles = $response->json()['articles'];
         foreach ($articles as $article) {
-            if (isset($article->id)){
+            if (isset($article->id)) {
                 $this->articleService->create([
                     'title' => $article['title'],
                     'description' => $article['description'],
@@ -75,7 +80,7 @@ class FetchArticles extends Command
                     'category' => 'general',
                     'url' => $article['url'],
                     'url_to_image' => $article['urlToImage'],
-                    'published_at' => date('Y-m-d H:i:s',strtotime($article['publishedAt'])),
+                    'published_at' => date('Y-m-d H:i:s', strtotime($article['publishedAt'])),
                 ]);
             }
         }
@@ -104,7 +109,7 @@ class FetchArticles extends Command
                 'category' => $article['sectionName'],
                 'url' => $article['webUrl'],
                 'url_to_image' => $article['fields']['thumbnail'] ?? null,
-                'published_at' => date('Y-m-d H:i:s',strtotime($article['webPublicationDate'])),
+                'published_at' => date('Y-m-d H:i:s', strtotime($article['webPublicationDate'])),
             ]);
         }
     }
@@ -129,7 +134,7 @@ class FetchArticles extends Command
                 'category' => $article['section'],
                 'url' => $article['url'],
                 'url_to_image' => $article['multimedia'][0]['url'] ?? null,
-                'published_at' => date('Y-m-d H:i:s',strtotime($article['published_date'])),
+                'published_at' => date('Y-m-d H:i:s', strtotime($article['published_date'])),
             ]);
         }
     }
