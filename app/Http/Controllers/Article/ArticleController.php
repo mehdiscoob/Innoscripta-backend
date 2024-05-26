@@ -3,9 +3,7 @@
 namespace App\Http\Controllers\Article;
 
 use App\Services\Article\ArticleServiceInterface;
-use App\Services\UserPreference\UserPreferenceServiceInterface;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
 
@@ -13,63 +11,111 @@ use App\Http\Controllers\Controller;
 class ArticleController extends Controller
 {
     protected ArticleServiceInterface $articleService;
-    protected UserPreferenceServiceInterface $userPreferenceService;
 
     /**
-     * ArticleController constructor.
+     * Constructor
      *
      * @param ArticleServiceInterface $articleService
-     * @param UserPreferenceServiceInterface $userPreferenceService
      */
-    public function __construct(
-        ArticleServiceInterface        $articleService,
-        UserPreferenceServiceInterface $userPreferenceService
-    )
+    public function __construct(ArticleServiceInterface $articleService)
     {
         $this->articleService = $articleService;
-        $this->userPreferenceService = $userPreferenceService;
     }
 
     /**
-     * Display a listing of the articles.
+     * Get all articles or search based on filters.
      *
-     * @param Request $request
+     * @param  Request  $request
      * @return JsonResponse
      */
     public function index(Request $request): JsonResponse
     {
-        $filters = $request->only(['keyword', 'category', 'source']);
+        try {
+            $filters = $request->only(['keyword', 'start_date', 'end_date', 'category', 'source']);
+            $articles = $this->articleService->getAll($filters);
 
-        $preferences = $this->userPreferenceService->getUserPreferences(Auth::id());
-
-        if ($preferences) {
-            if (!empty($preferences->preferred_sources)) {
-                $filters['source'] = $preferences->preferred_sources;
-            }
-            if (!empty($preferences->preferred_categories)) {
-                $filters['category'] = $preferences->preferred_categories;
-            }
-            if (!empty($preferences->preferred_authors)) {
-                $filters['author'] = $preferences->preferred_authors;
-            }
+            return response()->json(['articles' => $articles]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
         }
-
-
-        $articles = $this->articleService->getAllArticles($filters);
-
-        return response()->json($articles);
     }
 
     /**
-     * Display the specified article.
+     * Get an article by its ID.
      *
      * @param int $id
      * @return JsonResponse
      */
     public function show(int $id): JsonResponse
     {
-        $article = $this->articleService->findArticleById($id);
+        try {
+            $article = $this->articleService->getById($id);
 
-        return response()->json($article);
+            if ($article) {
+                return response()->json(['article' => $article]);
+            } else {
+                return response()->json(['error' => 'Article not found.'], 404);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Create a new article.
+     *
+     * @param  Request  $request
+     * @return JsonResponse
+     */
+    public function store(Request $request): JsonResponse
+    {
+        try {
+            $data = $request->all();
+            $article = $this->articleService->create($data);
+
+            return response()->json(['article' => $article], 201);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Update an existing article.
+     *
+     * @param  Request  $request
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function update(Request $request, int $id): JsonResponse
+    {
+        try {
+            $data = $request->all();
+            $article = $this->articleService->update($id, $data);
+
+            return response()->json(['article' => $article]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Delete an article.
+     *
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function destroy(int $id): JsonResponse
+    {
+        try {
+            $result = $this->articleService->delete($id);
+
+            if ($result) {
+                return response()->json(['message' => 'Article deleted successfully']);
+            } else {
+                return response()->json(['error' => 'Article not found.'], 404);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 }

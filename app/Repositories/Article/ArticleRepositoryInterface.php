@@ -2,26 +2,48 @@
 
 namespace App\Repositories\Article;
 
-
 use App\Models\Article;
-use Illuminate\Pagination\LengthAwarePaginator;
 
 interface ArticleRepositoryInterface
 {
-
     /**
-     * Get all articles with optional filters.
+     * Get all articles or search based on filters.
      *
      * @param array $filters
-     * @return LengthAwarePaginator
+     * @return array
      */
-    public function getAll(array $filters): LengthAwarePaginator;
+    public function getAll(array $filters = []): array;
 
     /**
-     * Find an article by its ID.
+     * Get an article by its ID.
      *
      * @param int $id
+     * @return Article|null
+     */
+    public function getById(int $id): ?Article;
+
+    /**
+     * Create a new article.
+     *
+     * @param array $data
      * @return Article
      */
-    public function find(int $id): Article;
+    public function create(array $data): Article;
+
+    /**
+     * Update an existing article.
+     *
+     * @param int $id
+     * @param array $data
+     * @return Article
+     */
+    public function update(int $id, array $data): Article;
+
+    /**
+     * Delete an article.
+     *
+     * @param int $id
+     * @return bool
+     */
+    public function delete(int $id): bool;
 }

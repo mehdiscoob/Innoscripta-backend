@@ -4,16 +4,15 @@ namespace App\Http\Controllers\UserPreference;
 
 use App\Http\Controllers\Controller;
 use App\Services\UserPreference\UserPreferenceServiceInterface;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\JsonResponse;
 
 class UserPreferenceController extends Controller
 {
     protected UserPreferenceServiceInterface $userPreferenceService;
 
     /**
-     * UserPreferenceController constructor.
+     * Constructor
      *
      * @param UserPreferenceServiceInterface $userPreferenceService
      */
@@ -23,28 +22,149 @@ class UserPreferenceController extends Controller
     }
 
     /**
-     * Get the preferences of the authenticated user.
+     * Get user preferences by user ID.
      *
+     * @param int $userId
      * @return JsonResponse
      */
-    public function getUserPreferences(): JsonResponse
+    public function getUserById(int $userId): JsonResponse
     {
-        $preferences = $this->userPreferenceService->getUserPreferences(Auth::id());
-
-        return response()->json($preferences);
+        try {
+            $userPreferences = $this->userPreferenceService->getByUserId($userId);
+            return response()->json(['user_preferences' => $userPreferences]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 
     /**
-     * Update the preferences of the authenticated user.
+     * Get all user preferences.
+     *
+     * @return JsonResponse
+     */
+    public function index(): JsonResponse
+    {
+        try {
+            $userPreferences = $this->userPreferenceService->getAll();
+
+            return response()->json(['user_preferences' => $userPreferences]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function show(int $id): JsonResponse
+    {
+        try {
+            $userPreferences = $this->userPreferenceService->getById($id);
+
+            return response()->json(['user_preferences' => $userPreferences]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Create or update user preferences.
      *
      * @param Request $request
      * @return JsonResponse
      */
-    public function updateUserPreferences(Request $request): JsonResponse
+    public function store(Request $request): JsonResponse
     {
-        $data = $request->only(['preferred_sources', 'preferred_categories', 'preferred_authors']);
-        $preferences = $this->userPreferenceService->updateUserPreferences(Auth::id(), $data);
+        try {
+            $preferences = $request->all();
+            $userPreferences = $this->userPreferenceService->create($preferences);
 
-        return response()->json($preferences);
+            return response()->json(['user_preferences' => $userPreferences], 201);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Update user preferences by ID.
+     *
+     * @param Request $request
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function update(Request $request, int $id): JsonResponse
+    {
+        try {
+            $preferences = $request->all();
+            $userPreferences = $this->userPreferenceService->updateById($id, $preferences);
+
+            return response()->json(['user_preferences' => $userPreferences]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Update user preferences by user ID.
+     *
+     * @param Request $request
+     * @param int $userId
+     * @return JsonResponse
+     */
+    public function updateByUserId(Request $request, int $userId): JsonResponse
+    {
+        try {
+            $preferences = $request->all();
+            $userPreferences = $this->userPreferenceService->updateByUserId($userId, $preferences);
+
+            return response()->json(['user_preferences' => $userPreferences]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Delete user preferences by user ID.
+     *
+     * @param int $userId
+     * @return JsonResponse
+     */
+    public function deleteByUserId(int $userId): JsonResponse
+    {
+        try {
+            $result = $this->userPreferenceService->deleteByUserId($userId);
+
+            if ($result) {
+                return response()->json(['message' => 'User preferences deleted successfully']);
+            } else {
+                return response()->json(['error' => 'User preferences not found.'], 404);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function destroy(int $id): JsonResponse
+    {
+        try {
+            $result = $this->userPreferenceService->deleteById($id);
+
+            if ($result) {
+                return response()->json(['message' => 'User preference deleted successfully']);
+            } else {
+                return response()->json(['error' => 'User preference not found.'], 404);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 }
