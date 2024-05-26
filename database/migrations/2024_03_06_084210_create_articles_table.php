@@ -23,7 +23,7 @@ class CreateArticlesTable extends Migration
             $table->string('category')->nullable();
             $table->string('url')->nullable();
             $table->string('url_to_image')->nullable();
-            $table->dateTime('published_at')->nullable();
+            $table->timestamp('published_at')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });
