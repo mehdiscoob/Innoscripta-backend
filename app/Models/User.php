@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -18,8 +19,7 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'name', 'email', 'email_verified_at', 'verification_code', 'mobile_verified_at', 'verified', 'mobile',
-        'password'
+        'name', 'email', 'password'
     ];
 
     /**
@@ -33,13 +33,13 @@ class User extends Authenticatable
     ];
 
     /**
-     * The attributes that should be cast.
+     * Get the user's preference.
      *
-     * @var array<string, string>
+     * @return HasOne
      */
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-        'password' => 'hashed',
-    ];
+    public function preference(): HasOne
+    {
+        return $this->hasOne(UserPreference::class);
+    }
 
 }

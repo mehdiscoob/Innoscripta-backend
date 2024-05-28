@@ -8,13 +8,30 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 class UserPreferenceRepository implements UserPreferenceRepositoryInterface
 {
     /**
+     * The UserPreference model instance.
+     *
+     * @var UserPreference
+     */
+    protected UserPreference $userPreferenceModel;
+
+    /**
+     * UserPreferenceRepository constructor.
+     *
+     * @param UserPreference $userPreferenceModel
+     */
+    public function __construct(UserPreference $userPreferenceModel)
+    {
+        $this->userPreferenceModel = $userPreferenceModel;
+    }
+
+    /**
      * Get all user preferences.
      *
      * @return array
      */
     public function getAll(): array
     {
-        return UserPreference::all()->toArray();
+        return $this->userPreferenceModel->newQuery()->paginate()->toArray();
     }
 
     /**
@@ -25,7 +42,7 @@ class UserPreferenceRepository implements UserPreferenceRepositoryInterface
      */
     public function create(array $preferences): UserPreference
     {
-        return UserPreference::create($preferences);
+        return $this->userPreferenceModel->create($preferences);
     }
 
     /**
@@ -52,7 +69,7 @@ class UserPreferenceRepository implements UserPreferenceRepositoryInterface
      */
     public function getById(int $id): ?UserPreference
     {
-        return UserPreference::find($id);
+        return $this->userPreferenceModel->findorFail($id);
     }
 
     /**
@@ -79,7 +96,7 @@ class UserPreferenceRepository implements UserPreferenceRepositoryInterface
      */
     public function getByUserId(int $userId): ?UserPreference
     {
-        return UserPreference::where('user_id', $userId)->first();
+        return $this->userPreferenceModel->where('user_id', $userId)->first();
     }
 
     /**
@@ -90,7 +107,7 @@ class UserPreferenceRepository implements UserPreferenceRepositoryInterface
      */
     public function deleteByUserId(int $userId): bool
     {
-        return (bool)UserPreference::where('user_id', $userId)->delete();
+        return (bool)$this->userPreferenceModel->where('user_id', $userId)->delete();
     }
 
     /**
@@ -101,6 +118,6 @@ class UserPreferenceRepository implements UserPreferenceRepositoryInterface
      */
     public function deleteById(int $id): bool
     {
-        return (bool)UserPreference::destroy($id);
+        return (bool)$this->userPreferenceModel->destroy($id);
     }
 }

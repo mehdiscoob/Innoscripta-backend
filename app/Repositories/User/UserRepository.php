@@ -8,14 +8,32 @@ use Illuminate\Contracts\Pagination\Paginator;
 class UserRepository implements UserRepositoryInterface
 {
     /**
+     * The User model instance.
+     *
+     * @var User
+     */
+    protected $userModel;
+
+    /**
+     * UserRepository constructor.
+     *
+     * @param User $userModel
+     */
+    public function __construct(User $userModel)
+    {
+        $this->userModel = $userModel;
+    }
+
+    /**
      * Get users as pagination.
      *
-     * @param array $data
+     * @param array|null $data
      * @return Paginator
      */
     public function getUserPaginate(?array $data): Paginator
     {
-        $users = User::query();
+        $users = $this->userModel->query();
+
         if (isset($data["keyword"])) {
             $users->where(function ($q) use ($data) {
                 $q->where("id", $data['keyword'])
@@ -24,9 +42,11 @@ class UserRepository implements UserRepositoryInterface
                     ->orWhere("mobile", "like", "%" . $data['keyword'] . "%");
             });
         }
+
         if (isset($data["orderBy"])) {
-            $users = $users->orderBy($data["orderByColumn"], $data["orderBy"]);
+            $users->orderBy($data["orderByColumn"], $data["orderBy"]);
         }
+
         return $users->paginate($data['perPage']);
     }
 
@@ -39,18 +59,7 @@ class UserRepository implements UserRepositoryInterface
      */
     public function create(array $data): User
     {
-        return User::create($data);
-    }
-
-    /**
-     * Find a user randomly based on their role.
-     *
-     * @param string|null $role
-     * @return User|null
-     */
-    public function findRandomly(?string $role): ?User
-    {
-        return User::where('role', $role ?? "customer")->inRandomOrder()->first();
+        return $this->userModel->create($data);
     }
 
     /**
@@ -61,18 +70,7 @@ class UserRepository implements UserRepositoryInterface
      */
     public function findByEmail(string $email): ?User
     {
-        return User::where('email', $email)->first();
-    }
-
-    /**
-     * Find a user by their mobile number.
-     *
-     * @param string $mobile
-     * @return User|null
-     */
-    public function findByMobile(string $mobile): ?User
-    {
-        return User::where('mobile', $mobile)->first();
+        return $this->userModel->where('email', $email)->first();
     }
 
     /**
@@ -102,7 +100,7 @@ class UserRepository implements UserRepositoryInterface
      */
     public function findById(int $userId): ?User
     {
-        return User::find($userId);
+        return $this->userModel->find($userId);
     }
 
     /**

@@ -7,12 +7,15 @@ use App\Models\Article;
 interface ArticleRepositoryInterface
 {
     /**
-     * Get all articles or search based on filters.
+     * Retrieve articles with optional filters.
      *
-     * @param array $filters
-     * @return array
+     * @param array $filters The filters to apply.
+     * @param int $perPage Number of articles per page.
+     * @param int|null $page The page number.
+     * @param bool $strict Whether to apply strict filtering.
+     * @return array The filtered articles.
      */
-    public function getAll(array $filters = []): array;
+    public function getArticles(array $filters = [], int $perPage = 10, ?int $page = null, bool $strict = true): array;
 
     /**
      * Get an article by its ID.

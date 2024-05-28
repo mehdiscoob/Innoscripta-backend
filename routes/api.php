@@ -23,6 +23,7 @@ Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logo
 Route::group(['middleware' => 'auth:sanctum'], function () {
 
     Route::middleware(['auth:api'])->prefix('article')->group(function () {
+        Route::get('/personalized-feed', [ArticleController::class, 'getPersonalizedFeed'])->name('articles.personalized-feed');
         Route::get('/', [ArticleController::class, 'index'])->name('articles.index');
         Route::post('/', [ArticleController::class, 'store'])->name('articles.store');
         Route::get('/{id}', [ArticleController::class, 'show'])->name('articles.show');
@@ -32,11 +33,12 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
     Route::middleware(['auth:api'])->prefix('user-preference')->group(function () {
         Route::get('/', [UserPreferenceController::class, 'index'])->name('user-preferences.index');
+        Route::post('/', [UserPreferenceController::class, 'store'])->name('user-preferences.create');
         Route::get('/{id}', [UserPreferenceController::class, 'show'])->name('user-preferences.show');
         Route::get('/user/{userId}', [UserPreferenceController::class, 'getUserById'])->name('user-preferences.getUserById');
         Route::put('/{id}', [UserPreferenceController::class, 'update'])->name('user-preferences.update');
         Route::put('/user/{userId}', [UserPreferenceController::class, 'updateByUserId'])->name('user-preferences.update');
-        Route::delete('/{userId}', [UserPreferenceController::class, 'deleteByUserId'])->name('user-preferences.deleteByUserId');
-        Route::delete('/preference/{id}', [UserPreferenceController::class, 'destroy'])->name('user-preferences.destroy');
+        Route::delete('/{id}', [UserPreferenceController::class, 'destroy'])->name('user-preferences.destroy');
+        Route::delete('/user/{userId}', [UserPreferenceController::class, 'deleteByUserId'])->name('user-preferences.deleteByUserId');
     });
 });

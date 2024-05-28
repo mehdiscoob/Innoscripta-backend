@@ -2,23 +2,42 @@
 
 namespace App\Services\Fetch;
 
-use App\Services\User\UserServiceInterface;
+use App\Services\Article\ArticleServiceInterface;
 
 class FetchArticleService
 {
-    public UserServiceInterface $userService;
+    /**
+     * The article service responsible for creating article records.
+     *
+     * @var ArticleServiceInterface
+     */
+    private ArticleServiceInterface $articleService;
 
-    public function __construct(UserServiceInterface $userService)
+    /**
+     * FetchArticleService constructor.
+     *
+     * @param ArticleServiceInterface $articleService The article service responsible for creating article records.
+     */
+    public function __construct(ArticleServiceInterface $articleService)
     {
-        $this->userService = $userService;
+        $this->articleService = $articleService;
     }
 
+    /**
+     * Fetch articles from multiple sources.
+     *
+     * This method uses various fetching strategies to retrieve articles from different
+     * sources (New York Times, The Guardian, and News API) and stores them using the
+     * provided article service.
+     *
+     * @return string Returns a message indicating the fetching process is done.
+     */
     public function fetch(): string
     {
-        (new NewYorkTimesService())->fetch($this->userService);
-        (new GuardianService())->fetch($this->userService);
-        (new NewsAPIService())->fetch($this->userService);
-        return "Fetching is done.";
+        $NYTime=(new NewYorkTimesService())->fetch($this->articleService);
+        $guardian=(new GuardianService())->fetch($this->articleService);
+        $newsAPI=(new NewsAPIService())->fetch($this->articleService);
+        return "NewYorkTimes:$NYTime, Guardian:$guardian, NewsAPI:$newsAPI";
     }
 
 }

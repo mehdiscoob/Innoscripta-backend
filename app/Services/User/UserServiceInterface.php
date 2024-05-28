@@ -5,13 +5,13 @@ namespace App\Services\User;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\Paginator;
 
-interface UserServiceInterface extends \App\Services\Article\ArticleServiceInterface
+interface UserServiceInterface
 {
 
     /**
      * Get users as pagination.
      *
-     * @param array $data
+     * @param array|null $data
      * @return Paginator
      */
     public function getUserPaginate(?array $data): Paginator;
@@ -61,18 +61,18 @@ interface UserServiceInterface extends \App\Services\Article\ArticleServiceInter
      *
      * @param array $userData
      * @param int $userId
-     * @return bool
+     * @return User|null
      */
-    public function updateUser(array $userData, int $userId): bool;
+    public function updateUser(array $userData, int $userId): ?User;
 
 
     /**
      * Create a user's information.
      *
      * @param array $userData
-     * @return User
+     * @return User|null
      */
-    public function createUser(array $userData): User;
+    public function createUser(array $userData): ?User;
 
 
     /**

@@ -2,9 +2,7 @@
 
 namespace App\Http\Requests\Article;
 
-use Illuminate\Http\Request;
 use Illuminate\Foundation\Http\FormRequest;
-use Modules\Article\App\Models\Article;
 
 class UpdateArticleRequest extends FormRequest
 {
@@ -12,25 +10,26 @@ class UpdateArticleRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      */
-    public function rules()
+    public function rules(): array
     {
         return [
-            'content' => 'string',
             'title' => 'string|max:255',
-            'publication_date' => 'date_format:Y-m-d H:i:s',
-            'publication_status' => 'in:draft,publish'
+            'description' => 'nullable|string',
+            'content' => 'string',
+            'author' => 'nullable|string|max:255',
+            'source' => 'nullable|string|max:255',
+            'category' => 'nullable|string|max:255',
+            'url' => 'nullable|url',
+            'url_to_image' => 'nullable|url',
+            'published_at' => 'nullable|date',
         ];
     }
 
     /**
      * Determine if the user is authorized to make this request.
      */
-    public function authorize()
+    public function authorize(): bool
     {
-        $id = $this->route('id');
-        $article = Article::where("id", $id)->where("user_id", $this->user()->id)->exists();
-        $roles = ["administrator", "super_admin"];
-        $isAdmin = $this->user()->hasRoleArray($roles);
-        return $isAdmin || $article;
+        return true;
     }
 }

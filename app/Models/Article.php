@@ -23,16 +23,7 @@ class Article extends Model
         'category',
         'url',
         'url_to_image',
-        'published_at',
+        'published_at'
     ];
 
-    /**
-     * Get the Article associated with the user.
-     *
-     * @return BelongsTo
-     */
-    public function user(): BelongsTo
-    {
-        return $this->belongsTo(User::class);
-    }
 }

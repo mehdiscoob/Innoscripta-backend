@@ -33,28 +33,12 @@ interface UserRepositoryInterface
     public function findById(int $userId): ?User;
 
     /**
-     * Find a user randomly based on their role.
-     *
-     * @param string|null $role
-     * @return User|null
-     */
-    public function findRandomly(?string $role): ?User;
-
-    /**
      * Find a user by their email address.
      *
      * @param string $email
      * @return User|null
      */
     public function findByEmail(string $email): ?User;
-
-    /**
-     * Find a user by their mobile number.
-     *
-     * @param string $mobile
-     * @return User|null
-     */
-    public function findByMobile(string $mobile): ?User;
 
     /**
      * Update a user's information.

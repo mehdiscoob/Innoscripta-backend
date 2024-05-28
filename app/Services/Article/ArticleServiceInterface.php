@@ -11,9 +11,12 @@ interface ArticleServiceInterface
      * Get all articles or search based on filters.
      *
      * @param array $filters
+     * @param int $perPage
+     * @param int|null $page
+     * @param bool $strict
      * @return array
      */
-    public function getAll(array $filters = []): array;
+    public function getArticles(array $filters = [], int $perPage = 10, ?int $page = null, bool $strict = true): array;
 
     /**
      * Get an article by its ID.
@@ -47,4 +50,11 @@ interface ArticleServiceInterface
      * @return bool
      */
     public function delete(int $id): bool;
+
+    /**
+     * Get a personalized news feed for the authenticated user based on preferences.
+     *
+     * @return array
+     */
+    public function getPersonalizedFeed(): array;
 }

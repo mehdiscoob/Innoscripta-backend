@@ -9,23 +9,26 @@ class CreateArticleRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      */
-    public function rules()
+    public function rules(): array
     {
         return [
-            'content' => 'required|string',
             'title' => 'required|string|max:255',
-            'publication_date' => 'required|date_format:Y-m-d H:i:s',
-            'publication_status' => 'required|in:draft,publish',
+            'description' => 'nullable|string',
+            'content' => 'required|string',
+            'author' => 'nullable|string|max:255',
+            'source' => 'nullable|string|max:255',
+            'category' => 'nullable|string|max:255',
+            'url' => 'nullable|url',
+            'url_to_image' => 'nullable|url',
+            'published_at' => 'nullable|date',
         ];
     }
 
     /**
      * Determine if the user is authorized to make this request.
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return true;
-        $roles=["expert","admin"];
-        return $this->user()!=null && $this->user()->id === $request->input('client_id') || $this->user()->hasRoleArray($roles);
     }
 }

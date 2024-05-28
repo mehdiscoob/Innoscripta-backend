@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\UserPreference;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\UserPreference\CreateUserPreferenceRequest;
+use App\Http\Requests\UserPreference\UpdateUserPreferenceRequest;
 use App\Services\UserPreference\UserPreferenceServiceInterface;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -73,13 +75,16 @@ class UserPreferenceController extends Controller
     /**
      * Create or update user preferences.
      *
-     * @param Request $request
+     * @param CreateUserPreferenceRequest $request
      * @return JsonResponse
      */
-    public function store(Request $request): JsonResponse
+    public function store(CreateUserPreferenceRequest $request): JsonResponse
     {
         try {
             $preferences = $request->all();
+            $preferences['preferred_sources'] = json_encode($request->get('preferred_sources'));
+            $preferences['preferred_categories'] = json_encode($request->get('preferred_categories'));
+            $preferences['preferred_authors'] = json_encode($request->get('preferred_authors'));
             $userPreferences = $this->userPreferenceService->create($preferences);
 
             return response()->json(['user_preferences' => $userPreferences], 201);
@@ -91,14 +96,17 @@ class UserPreferenceController extends Controller
     /**
      * Update user preferences by ID.
      *
-     * @param Request $request
+     * @param UpdateUserPreferenceRequest $request
      * @param int $id
      * @return JsonResponse
      */
-    public function update(Request $request, int $id): JsonResponse
+    public function update(UpdateUserPreferenceRequest $request, int $id): JsonResponse
     {
         try {
             $preferences = $request->all();
+            $preferences['preferred_sources'] = json_encode($request->get('preferred_sources'));
+            $preferences['preferred_categories'] = json_encode($request->get('preferred_categories'));
+            $preferences['preferred_authors'] = json_encode($request->get('preferred_authors'));
             $userPreferences = $this->userPreferenceService->updateById($id, $preferences);
 
             return response()->json(['user_preferences' => $userPreferences]);

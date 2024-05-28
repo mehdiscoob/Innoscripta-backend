@@ -27,7 +27,7 @@ class ArticleFactory extends Factory
             'category' => $this->faker->word,
             'url' => $this->faker->url,
             'url_to_image' => $this->faker->imageUrl,
-            'published_at' => $this->faker->dateTime,
+            'published_at' => date("Y-m-d H:i:s",time()),
         ];
     }
 }

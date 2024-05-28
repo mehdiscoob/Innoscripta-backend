@@ -5,7 +5,6 @@ namespace App\Services\User;
 use App\Models\User;
 use App\Repositories\User\UserRepositoryInterface;
 use Illuminate\Contracts\Pagination\Paginator;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class UserService implements UserServiceInterface
@@ -13,7 +12,7 @@ class UserService implements UserServiceInterface
     /**
      * @var UserRepositoryInterface
      */
-    protected $userRepository;
+    protected UserRepositoryInterface $userRepository;
 
     /**
      * UserService constructor.
@@ -29,7 +28,7 @@ class UserService implements UserServiceInterface
     /**
      * Get users as pagination.
      *
-     * @param array $data
+     * @param array|null $data
      * @return Paginator
      */
     public function getUserPaginate(?array $data): Paginator
@@ -98,9 +97,9 @@ class UserService implements UserServiceInterface
      *
      * @param array $userData
      * @param int $userId
-     * @return bool
+     * @return User|null
      */
-    public function updateUser(array $userData, int $userId): bool
+    public function updateUser(array $userData, int $userId): ?User
     {
         return $this->userRepository->update($userData, $userId);
     }
@@ -109,9 +108,10 @@ class UserService implements UserServiceInterface
      * Create a user's information.
      *
      * @param array $userData
-     * @return User
+     * @return User|null
+     * @throws \Exception
      */
-    public function createUser(array $userData): User
+    public function createUser(array $userData): ?User
     {
         DB::beginTransaction();
         try {

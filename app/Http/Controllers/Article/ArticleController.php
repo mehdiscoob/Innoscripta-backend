@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Article;
 
+use App\Http\Requests\Article\CreateArticleRequest;
+use App\Http\Requests\Article\UpdateArticleRequest;
 use App\Services\Article\ArticleServiceInterface;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -32,7 +34,7 @@ class ArticleController extends Controller
     {
         try {
             $filters = $request->only(['keyword', 'start_date', 'end_date', 'category', 'source']);
-            $articles = $this->articleService->getAll($filters);
+            $articles = $this->articleService->getArticles($filters);
 
             return response()->json(['articles' => $articles]);
         } catch (\Exception $e) {
@@ -64,10 +66,10 @@ class ArticleController extends Controller
     /**
      * Create a new article.
      *
-     * @param  Request  $request
+     * @param  CreateArticleRequest  $request
      * @return JsonResponse
      */
-    public function store(Request $request): JsonResponse
+    public function store(CreateArticleRequest $request): JsonResponse
     {
         try {
             $data = $request->all();
@@ -82,11 +84,11 @@ class ArticleController extends Controller
     /**
      * Update an existing article.
      *
-     * @param  Request  $request
+     * @param  UpdateArticleRequest  $request
      * @param int $id
      * @return JsonResponse
      */
-    public function update(Request $request, int $id): JsonResponse
+    public function update(UpdateArticleRequest $request, int $id): JsonResponse
     {
         try {
             $data = $request->all();
@@ -114,6 +116,21 @@ class ArticleController extends Controller
             } else {
                 return response()->json(['error' => 'Article not found.'], 404);
             }
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Get the personalized news feed for the authenticated user.
+     *
+     * @return JsonResponse
+     */
+    public function getPersonalizedFeed(): JsonResponse
+    {
+        try {
+            $articles = $this->articleService->getPersonalizedFeed();
+            return response()->json(['articles' => $articles]);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
