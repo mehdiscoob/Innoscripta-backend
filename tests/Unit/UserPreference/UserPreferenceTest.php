@@ -151,4 +151,23 @@ class UserPreferenceTest extends TestCase
 
         $response->assertStatus(200);
     }
+
+    /**
+     * Test getting personalized feed.
+     *
+     */
+    public function test_get_personalized_feed()
+    {
+        $user = User::factory()->create();
+        $token = $user->createToken('TestToken')->plainTextToken;
+
+        UserPreference::factory()->create([
+            'user_id' => $user->id
+        ]);
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token])->get('/api/article/personalized-feed');
+
+        $response->assertStatus(200);
+    }
 }
