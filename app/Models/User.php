@@ -9,6 +9,41 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
+/**
+ * @OA\Schema(
+ *      schema="User",
+ *      title="User",
+ *      description="User model",
+ *      @OA\Property(
+ *          property="id",
+ *          type="integer",
+ *          description="The unique identifier for the user",
+ *      ),
+ *      @OA\Property(
+ *          property="name",
+ *          type="string",
+ *          description="The name of the user",
+ *      ),
+ *      @OA\Property(
+ *          property="email",
+ *          type="string",
+ *          format="email",
+ *          description="The email address of the user",
+ *      ),
+ *      @OA\Property(
+ *          property="created_at",
+ *          type="string",
+ *          description="The date and time when the user was created",
+ *          example="2022-06-29 12:00:00",
+ *      ),
+ *      @OA\Property(
+ *          property="updated_at",
+ *          type="string",
+ *          description="The date and time when the user was last updated",
+ *          example="2022-06-29 12:00:00",
+ *      ),
+ * )
+ */
 class User extends Authenticatable
 {
     use  HasFactory, Notifiable, SoftDeletes,HasApiTokens;

@@ -117,10 +117,9 @@ class ArticleService implements ArticleServiceInterface
             throw new ModelNotFoundException('User preferences are empty.');
         }
 
-        $filters['source'] = $preferredSources;
-        $filters['category'] = $preferredCategories;
-        $filters['author'] = $preferredAuthors;
-
-        return $this->articleRepository->getArticles($filters,strict: false);
+        $filters['source'] = json_decode($preferredSources);
+        $filters['category'] = json_decode($preferredCategories);
+        $filters['author'] = json_decode($preferredAuthors);
+        return $this->articleRepository->getArticles($filters, strict: false);
     }
 }

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\UserPreference\CreateUserPreferenceRequest;
 use App\Http\Requests\UserPreference\UpdateUserPreferenceRequest;
 use App\Services\UserPreference\UserPreferenceServiceInterface;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
@@ -29,12 +30,56 @@ class UserPreferenceController extends Controller
      * @param int $userId
      * @return JsonResponse
      */
-    public function getUserById(int $userId): JsonResponse
+    public function getByUserId(int $userId): JsonResponse
     {
         try {
             $userPreferences = $this->userPreferenceService->getByUserId($userId);
             return response()->json(['user_preferences' => $userPreferences]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * @OA\Get(
+     *      path="/api/user-preference/auth",
+     *      operationId="getUserPreferencesByAuth",
+     *      tags={"User Preferences"},
+     *      summary="Get user preferences by Authentication",
+     *      description="Retrieve user preferences for the authenticated user.",
+     *      security={{"bearerAuth":{}}},
+     *      @OA\Response(
+     *          response=200,
+     *          description="User preferences retrieved successfully",
+     *          @OA\JsonContent(
+     *              type="object",
+     *              @OA\Property(property="user_preferences", ref="#/components/schemas/UserPreference"),
+     *          ),
+     *      ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="User preferences not found",
+     *          @OA\JsonContent(
+     *              type="object",
+     *              @OA\Property(property="error", type="string"),
+     *          ),
+     *      ),
+     *      @OA\Response(
+     *          response=500,
+     *          description="Internal Server Error",
+     *          @OA\JsonContent(
+     *              type="object",
+     *              @OA\Property(property="error", type="string"),
+     *          ),
+     *      ),
+     * )
+     */
+    public function getByAuth(): JsonResponse
+    {
+        try {
+            $userPreferences = $this->userPreferenceService->getByAuth();
+            return response()->json(['user_preferences' => $userPreferences]);
+        } catch (Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
@@ -50,7 +95,7 @@ class UserPreferenceController extends Controller
             $userPreferences = $this->userPreferenceService->getAll();
 
             return response()->json(['user_preferences' => $userPreferences]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
@@ -67,7 +112,7 @@ class UserPreferenceController extends Controller
             $userPreferences = $this->userPreferenceService->getById($id);
 
             return response()->json(['user_preferences' => $userPreferences]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
@@ -88,7 +133,7 @@ class UserPreferenceController extends Controller
             $userPreferences = $this->userPreferenceService->create($preferences);
 
             return response()->json(['user_preferences' => $userPreferences], 201);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
@@ -110,7 +155,7 @@ class UserPreferenceController extends Controller
             $userPreferences = $this->userPreferenceService->updateById($id, $preferences);
 
             return response()->json(['user_preferences' => $userPreferences]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
@@ -129,7 +174,62 @@ class UserPreferenceController extends Controller
             $userPreferences = $this->userPreferenceService->updateByUserId($userId, $preferences);
 
             return response()->json(['user_preferences' => $userPreferences]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * @OA\Put(
+     *      path="/api/user-preference/auth",
+     *      operationId="updateUserPreferencesByAuth",
+     *      tags={"User Preferences"},
+     *      summary="Update user preferences by Authentication",
+     *      description="Update or create user preferences for the authenticated user.",
+     *      security={{"bearerAuth":{}}},
+     *      @OA\RequestBody(
+     *          required=true,
+     *          description="User preferences to be updated or created",
+     *          @OA\JsonContent(
+     *              required={"preferred_sources", "preferred_categories", "preferred_authors"},
+     *              @OA\Property(property="preferred_sources", type="array", @OA\Items(type="string")),
+     *              @OA\Property(property="preferred_categories", type="array", @OA\Items(type="string")),
+     *              @OA\Property(property="preferred_authors", type="array", @OA\Items(type="string")),
+     *          ),
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="User preferences updated successfully",
+     *          @OA\JsonContent(
+     *              type="object",
+     *              @OA\Property(property="user_preferences", ref="#/components/schemas/UserPreference"),
+     *          ),
+     *      ),
+     *      @OA\Response(
+     *          response=201,
+     *          description="User preferences created successfully",
+     *          @OA\JsonContent(
+     *              type="object",
+     *              @OA\Property(property="user_preferences", ref="#/components/schemas/UserPreference"),
+     *          ),
+     *      ),
+     *      @OA\Response(
+     *          response=500,
+     *          description="Internal Server Error",
+     *          @OA\JsonContent(
+     *              type="object",
+     *              @OA\Property(property="error", type="string"),
+     *          ),
+     *      ),
+     * )
+     */
+    public function updateByAuth(Request $request): JsonResponse
+    {
+        try {
+            $preferences = $request->all();
+            $userPreferences = $this->userPreferenceService->updateByAuth($preferences);
+            return response()->json(['user_preferences' => $userPreferences['data']],$userPreferences['code']);
+        } catch (Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
@@ -150,7 +250,7 @@ class UserPreferenceController extends Controller
             } else {
                 return response()->json(['error' => 'User preferences not found.'], 404);
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
@@ -171,7 +271,7 @@ class UserPreferenceController extends Controller
             } else {
                 return response()->json(['error' => 'User preference not found.'], 404);
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }

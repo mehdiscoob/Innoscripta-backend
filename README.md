@@ -1,137 +1,204 @@
-# Sample Laravel Project
+# News Aggregator Backend
 
-This is a Laravel project that includes a Docker setup for easy development and deployment.
+This is the backend for the News Aggregator application, built using Laravel. It provides APIs for user authentication,
+article management, and personalized news feeds. The backend aggregates news from various sources, stores them locally,
+and allows users to search and filter articles.
+
+## Table of Contents
+
+- [Features](#features)
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Running the Application](#running-the-application)
+- [Fetching Articles](#fetching-articles)
+- [API Documentation](#api-documentation)
+- [Running Tests](#running-tests)
+- [Scheduled Tasks](#scheduled-tasks)
+- [Dockerization](#dockerization)
+- [Contributing](#contributing)
+
+## Features
+
+- User authentication and registration
+- Aggregation of news articles from multiple sources
+- Article search and filtering by keyword, date, category, and source
+- Personalized news feed based on user preferences
+- API documentation with Swagger
+
+## Requirements
+
+- Docker and Docker Compose
+- PHP 8.0+
+- Composer
+- MySQL or PostgreSQL
 
 ## Installation
 
-### Prerequisites
+1. Clone the repository:
+    ```bash
+    git clone https://github.com/mehdiscoob/Innoscripta-backend.git
+    cd Innoscripta-backend
+    ```
 
-Make sure you have the following installed on your system:
+2. Install dependencies:
+    ```bash
+    composer install
+    ```
 
-- [Docker](https://www.docker.com/)
-- [Docker Compose](https://docs.docker.com/compose/install/)
+3. Copy and modify the `.env` file:
+    ```bash
+    cp .env.example .env
+    ```
 
-### Steps
+   Configure the database connection and other environment variables in the `.env` file.
 
-1. **Build and start the Docker containers:**
+4. Generate an application key:
+    ```bash
+    php artisan key:generate
+    ```
 
-   ```bash
-   docker compose up -d
-   ```
+5. Run the database migrations:
+    ```bash
+    php artisan migrate
+    ```
 
-This command sets up MySQL, PHP, and Nginx in Docker containers, and it also runs Migrate and Seeder plus Unit Test:
+6. Install Swagger for API documentation:
+    ```bash
+    php artisan l5-swagger:generate
+    ```
 
-- **MySQL:** Stores application data; configure it in your Laravel app.
-- **PHP:** Handles Laravel requests using PHP-FPM.
-- **Nginx:** Acts as a reverse proxy, directing HTTP requests to the PHP container.
+## Running the Application
 
-Access your Laravel app at http://localhost:9000. Code changes reflect in real-time.
+### Using Docker
 
-### Helpers
+1. Build and start the containers:
+    ```bash
+    docker-compose up --build
+    ```
 
-- **Sapmle Data:**
-    - **Admin:** `{username:"admin@gmail.com",password:"123456789"}`
-    - **Client:** `{username:"client@gmail.com",password:"123456789"}`
+2. The application will be available at `http://localhost:8000`.
 
-- **Refresh Database:**
-    - **Command:** `docker exec -it laravel-app-1 php artisan refresh-db-command`
-    - **Description:** You can refresh the database using this Artisan command. Execute this command in the Laravel
-      project directory to reset and reseed the database, ensuring a clean and updated state for your application.
+### Without Docker
 
-Feel free to utilize these helper endpoints and commands for managing orders, trips, and database refresh operations in
-your Laravel application!
+1. Start the Laravel development server:
+    ```bash
+    php artisan serve
+    ```
 
-### APIs for Managing Articles
+2. The application will be available at `http://localhost:8000`.
 
-#### Login
+## Fetching Articles
 
-- **GET `http://localhost:9000/login`**
-    - **Description:** You can login with this API. Use Sample data(Client or Admin) for login.
-    - **Controller Method:** `LoginController::login`
-    - **Route Name:** `login`
-    - **Practical:** It gives you user information and you should use access_token for all APIs Authorization
-    - **Permissions:**
-        - All
+To fetch articles from The New York Times, The Guardian, and NewsAPI, use the following command:
 
-#### Retrieve Articles
+### Running `php artisan fetch:articles`
 
-- **GET `http://localhost:9000/article`**
-    - **Description:** Retrieves a paginated list of articles.
-    - **Controller Method:** `ArticleController::getArticlePaginate`
-    - **Route Name:** `article`
-    - **Permissions:**
-        - Admin
+#### With Docker
 
-#### Retrieve Articles by User ID
-
-- **GET `http://localhost:9000/article/by-user`**
-    - **Description:** Retrieves a paginated list of articles By ID.
-    - **Controller Method:** `ArticleController::getArticelsByUserID`
-    - **Route Name:** `article.by.user`
-    - **Permissions:**
-        - Client
-
-#### Retrieve Article by ID
-
-- **GET `http://localhost:9000/article/{id}`**
-    - **Description:** Retrieves a specific article by its ID.
-    - **Controller Method:** `ArticleController::findById`
-    - **Route Name:** `article.id`
-    - **Permissions:**
-        - Admin
-        - Client
-
-#### Create Article
-
-- **POST `http://localhost:9000/article`**
-    - **Description:** Creates a new article.
-    - **Controller Method:** `ArticleController::store`
-    - **Route Name:** `article.create`
-    - **Permissions:**
-        - Admin
-        - Client
-
-#### Update Article by ID
-
-- **PATCH `http://localhost:9000/article/{id}`**
-    - **Description:** Updates an existing article by its ID.
-    - **Controller Method:** `ArticleController::update`
-    - **Route Name:** `article.update.id`
-    - **Permissions:**
-        - Admin
-        - Article Owner
-
-#### Change status Article by ID
-
-- **PATCH `http://localhost:9000/article/status/{id}`**
-    - **Description:** Changes status of an existing article by its ID.
-    - **Controller Method:** `ArticleController::changeStatusArticle`
-    - **Route Name:** `article.change.status.id`
-    - **Permissions:**
-        - Admin
-
-#### Delete Article by ID
-
-- **DELETE `http://localhost:9000/article/{id}`**
-    - **Description:** Deletes an existing article by its ID.
-    - **Controller Method:** `ArticleController::delete`
-    - **Route Name:** `article.delete.id`
-    - **Permissions:**
-        - Admin
-
-### Testing
-
-This Laravel project includes unit tests for the `ArticleService` class. These tests validate the functionality and
-statuses of the main APIs.
-
-To run the tests, execute the following command in your terminal within the project directory:
+If you're using Docker, you can run the `php artisan fetch:articles` command within your Docker container. This command executes any scheduled tasks defined in your Laravel application.
 
 ```bash
-docker exec -it laravel-app-1 php artisan test
-```
+docker exec -it laravel-app php artisan fetch:articles
+````
+
+This command will aggregate news articles from the specified sources and store them in the local database.
+
+## API Documentation
+
+The API documentation is generated using Swagger. After running the application, you can access the API documentation
+at:
+
+[http://localhost:8000/api/documentation](http://localhost:8000/api/documentation)
+
+### API Endpoints
+
+**User Authentication**
+
+- `POST /register`: Register a new user
+- `POST /login`: Log in a user
+- `POST /logout`: Log out a user (Requires authentication)
+
+**Articles**
+
+- `GET /article`: Retrieve a list of articles with optional filters (keyword, date, category, source)
+- `GET /article/personalized-feed`: Retrieve a personalized news feed based on user preferences (Requires
+  authentication)
+
+**User Preferences**
+
+- `PUT /user-preference/auth`: Update or create user preferences (Requires authentication)
+- `GET /user-preference/auth`: Retrieve user preferences (Requires authentication)
+
+## Running Tests
+
+The project includes tests to ensure the functionality works as expected. To run the tests, use:
+
+### Running `php artisan test`
+
+#### With Docker
+
+If you're using Docker, you can run the `php artisan test` command within your Docker container. This command executes any scheduled tasks defined in your Laravel application.
+
+```bash
+docker exec -it laravel-app php artisan test
+````
+
+## Scheduled Tasks
+
+To automatically fetch articles from various sources every day, the application is configured to run the `FetchArticlesCommand` daily. This command retrieves articles and stores them in the local database.
+
+To set up the scheduled task, ensure that your server's cron jobs are configured to run Laravel's scheduler. The command to schedule is:
+
+### Running `php artisan schedule:work`
+
+#### With Docker
+
+If you're using Docker, you can run the `php artisan schedule:work` command within your Docker container. This command executes any scheduled tasks defined in your Laravel application.
+
+```bash
+docker exec -it laravel-app php artisan schedule:work
+````
+## Dockerization
+
+This Laravel application can be Dockerized for easy development and deployment.
+
+### Prerequisites
+
+Ensure Docker and Docker Compose are installed on your machine.
+
+### Configuration
+
+Use the provided `docker-compose.yml` to define services: MySQL and Nginx.
+
+### Building & Running
+
+1. Navigate to project root.
+2. Build containers: `docker-compose build`.
+3. Start containers: `docker-compose up`.
+
+Access the app at [http://localhost:9000](http://localhost:9000).
+
+### Customization
+
+- Adjust environment variables in `docker-compose.yml`.
+- Modify Nginx configuration in `nginx.conf`.
+
+### Development
+
+Use Docker for local development, enabling immediate code changes.
+
+### Deployment
+
+Adapt `docker-compose.yml` and Nginx config for production. Consider Docker Swarm or Kubernetes for orchestration.
 
 
+## Contributing
+We welcome contributions to the project. To contribute:
 
+1. Fork the repository.
+2. Create a new feature branch.
+3. Make your changes.
+4. Submit a pull request.
 
-
+Please ensure your code follows best practices and includes appropriate tests.
 

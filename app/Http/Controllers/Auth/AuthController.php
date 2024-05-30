@@ -21,10 +21,40 @@ class AuthController extends Controller
     }
 
     /**
-     * Register a new user.
-     *
-     * @param Request $request
-     * @return JsonResponse
+     * @OA\Post(
+     *      path="/api/register",
+     *      operationId="registerUser",
+     *      tags={"Authentication"},
+     *      summary="Register a new user",
+     *      description="Register a new user with the provided name, email, and password.",
+     *      @OA\RequestBody(
+     *          required=true,
+     *          description="User details",
+     *          @OA\JsonContent(
+     *              required={"name", "email", "password"},
+     *              @OA\Property(property="name", type="string", example="John Doe"),
+     *              @OA\Property(property="email", type="string", format="email", example="john@example.com"),
+     *              @OA\Property(property="password", type="string", example="password"),
+     *          ),
+     *      ),
+     *      @OA\Response(
+     *          response=201,
+     *          description="User registered successfully",
+     *          @OA\JsonContent(
+     *              type="object",
+     *              @OA\Property(property="user", ref="#/components/schemas/User"),
+     *              @OA\Property(property="access_token", type="string"),
+     *          ),
+     *      ),
+     *      @OA\Response(
+     *          response=422,
+     *          description="Validation errors",
+     *          @OA\JsonContent(
+     *              type="object",
+     *              @OA\Property(property="message", type="string"),
+     *          ),
+     *      ),
+     * )
      */
     public function register(Request $request): JsonResponse
     {
@@ -36,15 +66,43 @@ class AuthController extends Controller
 
         $user = $this->userService->register($request->all());
         $token = $user->createToken('auth_token')->plainTextToken;
-        return response()->json(["user"=>$user,"access_token"=>$token], Response::HTTP_CREATED);
+        return response()->json(["user" => $user, "access_token" => $token], Response::HTTP_CREATED);
     }
 
     /**
-     * Log in an existing user.
-     *
-     * @param Request $request
-     * @return JsonResponse
-     * @throws ValidationException
+     * @OA\Post(
+     *      path="/api/login",
+     *      operationId="loginUser",
+     *      tags={"Authentication"},
+     *      summary="Log in an existing user",
+     *      description="Log in an existing user with the provided email and password.",
+     *      @OA\RequestBody(
+     *          required=true,
+     *          description="User credentials",
+     *          @OA\JsonContent(
+     *              required={"email", "password"},
+     *              @OA\Property(property="email", type="string", format="email", example="john@example.com"),
+     *              @OA\Property(property="password", type="string", example="password"),
+     *          ),
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="User logged in successfully",
+     *          @OA\JsonContent(
+     *              type="object",
+     *              @OA\Property(property="user", ref="#/components/schemas/User"),
+     *              @OA\Property(property="access_token", type="string"),
+     *          ),
+     *      ),
+     *      @OA\Response(
+     *          response=422,
+     *          description="Validation errors",
+     *          @OA\JsonContent(
+     *              type="object",
+     *              @OA\Property(property="message", type="string"),
+     *          ),
+     *      ),
+     * )
      */
     public function login(Request $request): JsonResponse
     {
@@ -62,14 +120,26 @@ class AuthController extends Controller
         $user = $request->user();
         $token = $user->createToken('auth_token')->plainTextToken;
 
-        return response()->json(['access_token' => $token, 'token_type' => 'Bearer']);
+        return response()->json(['access_token' => $token, 'user' => $user]);
     }
 
     /**
-     * Log out the authenticated user.
-     *
-     * @param Request $request
-     * @return JsonResponse
+     * @OA\Post(
+     *      path="/api/logout",
+     *      operationId="logoutUser",
+     *      tags={"Authentication"},
+     *      summary="Log out the authenticated user",
+     *      description="Log out the authenticated user by revoking the access token.",
+     *      security={{"bearerAuth":{}}},
+     *      @OA\Response(
+     *          response=200,
+     *          description="User logged out successfully",
+     *          @OA\JsonContent(
+     *              type="object",
+     *              @OA\Property(property="message", type="string"),
+     *          ),
+     *      ),
+     * )
      */
     public function logout(Request $request): JsonResponse
     {

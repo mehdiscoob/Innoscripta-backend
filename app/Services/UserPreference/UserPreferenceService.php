@@ -4,6 +4,7 @@ namespace App\Services\UserPreference;
 
 use App\Repositories\UserPreference\UserPreferenceRepositoryInterface;
 use App\Models\UserPreference;
+use Illuminate\Support\Facades\Auth;
 
 class UserPreferenceService implements UserPreferenceServiceInterface
 {
@@ -52,6 +53,17 @@ class UserPreferenceService implements UserPreferenceServiceInterface
     }
 
     /**
+     * Get user preferences by Authentication.
+     *
+     * @return UserPreference|null
+     */
+    public function getByAuth(): ?UserPreference
+    {
+        $userId=Auth::id();
+        return $this->userPreferenceRepository->getByUserId($userId);
+    }
+
+    /**
      * Create user preferences.
      *
      * @param array $preferences The user preferences to be stored.
@@ -63,7 +75,7 @@ class UserPreferenceService implements UserPreferenceServiceInterface
         foreach ($preferences as $key => $value) {
             $encodedPreferences[$key] = json_encode($value);
         }
-        return $this->userPreferenceRepository->create($preferences);
+        return $this->userPreferenceRepository->create($encodedPreferences);
     }
 
     /**
@@ -97,6 +109,32 @@ class UserPreferenceService implements UserPreferenceServiceInterface
         }
         return $this->userPreferenceRepository->updateByUserId($userId, $encodedPreferences);
     }
+
+    /**
+     * Update or create user preferences for the authenticated user.
+     *
+     * This method checks if user preferences already exist for the authenticated user.
+     * If they do, it updates the preferences with the provided data. If not, it creates new preferences.
+     * The preferences are encoded as JSON before being stored.
+     *
+     * @param array $preferences The user preferences to be stored or updated. Each preference will be JSON encoded.
+     * @return array Returns an array containing the updated or created UserPreference data and HTTP status code.
+     */
+    public function updateByAuth(array $preferences): array
+    {
+        $encodedPreferences = [];
+        $userId = Auth::id();
+        $isPreferenceExist = $this->getByUserId($userId);
+        foreach ($preferences as $key => $value) {
+            $encodedPreferences[$key] = json_encode($value);
+        }
+        if (isset($isPreferenceExist)) {
+            return ["data"=>$this->userPreferenceRepository->updateByUserId($userId, $encodedPreferences),"code"=>200];
+        }
+        $preferences["user_id"] = $userId;
+        return ["data"=>$this->userPreferenceRepository->create($preferences),"code"=>201];
+    }
+
 
     /**
      * Delete user preferences by user ID.

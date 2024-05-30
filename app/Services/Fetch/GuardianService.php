@@ -25,7 +25,7 @@ class GuardianService implements FetchArticleStragtegy
             $response = Http::withOptions(['verify' => false])->get(env("GUARDIAN_API_URL"), [
                 'api-key' => env('GUARDIAN_API_KEY'),
                 'show-fields' => 'all',
-                'page-size' => 10,
+                'page-size' => 20,
             ]);
 
             $articles = $response->json()['response']['results'];

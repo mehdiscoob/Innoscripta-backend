@@ -27,8 +27,8 @@ class InstallCommand extends Command
     public function handle()
     {
         Artisan::call("migrate");
-        Artisan::call("db:seed");
-        Artisan::call("module:seed Article");
+        Artisan::call("l5-swagger:generate");
+        Artisan::call("fetch:articles");
         $this->info('Database installed and seeded successfully.');
     }
 }

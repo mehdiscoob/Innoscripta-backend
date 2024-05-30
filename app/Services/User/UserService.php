@@ -4,8 +4,10 @@ namespace App\Services\User;
 
 use App\Models\User;
 use App\Repositories\User\UserRepositoryInterface;
+use Exception;
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class UserService implements UserServiceInterface
 {
@@ -60,28 +62,6 @@ class UserService implements UserServiceInterface
     }
 
     /**
-     * Get a user by their mobile number.
-     *
-     * @param string $mobile
-     * @return User|null
-     */
-    public function getUserByMobile(string $mobile): ?User
-    {
-        return $this->userRepository->findByMobile($mobile);
-    }
-
-    /**
-     * Find a user randomly based on their role.
-     *
-     * @param string|null $role
-     * @return User|null
-     */
-    public function findRandomly(?string $role): ?User
-    {
-        return $this->userRepository->findRandomly($role);
-    }
-
-    /**
      * Find a user by their ID.
      *
      * @param int $id
@@ -109,7 +89,7 @@ class UserService implements UserServiceInterface
      *
      * @param array $userData
      * @return User|null
-     * @throws \Exception
+     * @throws Exception
      */
     public function createUser(array $userData): ?User
     {
@@ -119,7 +99,7 @@ class UserService implements UserServiceInterface
             DB::commit();
             return $user;
 
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             DB::rollBack();
             throw $exception;
         }
@@ -134,6 +114,7 @@ class UserService implements UserServiceInterface
      */
     public function register(array $userData): User
     {
+        $userData['password']=Hash::make($userData['password']);
         return $this->userRepository->create($userData);
     }
 

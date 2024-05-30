@@ -32,21 +32,6 @@ interface UserServiceInterface
      */
     public function getUserByEmail(string $email): ?User;
 
-    /**
-     * Get a user by their mobile number.
-     *
-     * @param string $mobile
-     * @return User|null
-     */
-    public function getUserByMobile(string $mobile): ?User;
-
-    /**
-     * Find a user randomly based on their role.
-     *
-     * @param string|null $role
-     * @return User|null
-     */
-    public function findRandomly(?string $role): ?User;
 
     /**
      * Find a user by their ID.

@@ -25,7 +25,7 @@ class NewsAPIService implements FetchArticleStragtegy
             $response = Http::withOptions(['verify' => false])->get(env("NEWS_API_URL"), [
                 'apiKey' => env('NEWS_API_KEY'),
                 'language' => 'en',
-                'pageSize' => 10,
+                'pageSize' => 20,
             ]);
             $articles = $response->json()['articles'];
             foreach ($articles as $article) {
@@ -36,7 +36,7 @@ class NewsAPIService implements FetchArticleStragtegy
                         'content' => $article['content'],
                         'author' => $article['author'],
                         'source' => $article['source']['name'],
-                        'category' => 'general',
+                        'category' => 'General',
                         'url' => $article['url'],
                         'url_to_image' => $article['urlToImage'],
                         'published_at' => date('Y-m-d H:i:s', strtotime($article['publishedAt'])),

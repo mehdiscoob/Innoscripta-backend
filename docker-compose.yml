@@ -33,6 +33,12 @@ services:
             DB_DATABASE: laravel
             DB_USERNAME: root
             DB_PASSWORD: 123456789
+            NEWS_API_KEY: 537c16dc0afc4ea7a5fa8ceec14e345a
+            NYTIMES_API_KEY: hgSUAB7U43TAAZUVCEauSGURyUTuvL7y
+            GUARDIAN_API_KEY: 27b4c167-6788-4995-95a1-72770336d6d2
+            NEWS_API_URL: https://newsapi.org/v2/top-headlines
+            NYTIMES_API_URL: https://api.nytimes.com/svc/topstories/v2/home.json
+            GUARDIAN_API_URL: https://content.guardianapis.com/search
         command: bash -c "php artisan install-command && php-fpm"
         depends_on:
             mysql:

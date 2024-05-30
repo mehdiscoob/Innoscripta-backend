@@ -1,6 +1,6 @@
 <?php
 
-// app/Console/Commands/FetchArticles.php
+// app/Console/Commands/FetchArticlesCommand.php
 
 namespace App\Console\Commands;
 
@@ -8,10 +8,10 @@ use App\Services\Fetch\FetchArticleService;
 use Illuminate\Console\Command;
 
 /**
- * Class FetchArticles
+ * Class FetchArticlesCommand
  * @package App\Console\Commands
  */
-class FetchArticles extends Command
+class FetchArticlesCommand extends Command
 {
     /**
      * The name and signature of the console command.
